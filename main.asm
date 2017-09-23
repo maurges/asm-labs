@@ -1,5 +1,5 @@
-%include "meta.asm"
-%include "syscalls.asm"
+%include "meta.inc"
+%include "syscalls.inc"
 
 global _start
 
