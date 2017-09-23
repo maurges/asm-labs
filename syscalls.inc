@@ -1,6 +1,8 @@
 %ifndef ASM_LABS_SYSCALLS
 %define ASM_LABS_SYSCALLS
 
+;; vim: syntax=asm
+
 %define sys_read                    0
 %define sys_write                   1
 %define sys_open                    2

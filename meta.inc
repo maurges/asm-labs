@@ -1,7 +1,7 @@
 %ifndef ASM_LAB_META
 %define ASM_LAB_META
 
-;; vim: foldmethod=marker
+;; vim: syntax=asm
 
 
 ;; a set of macros to quickly put arguments for fastcall
@@ -121,6 +121,7 @@
     %1:
 %endmacro
 %macro endsub 0
+    ret
 	%pop
 %endmacro
 
