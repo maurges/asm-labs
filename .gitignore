@@ -1,0 +1,5 @@
+*.o
+*.l
+.*.swp
+.tags
+main
