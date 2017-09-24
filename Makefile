@@ -3,10 +3,10 @@ NASMFLAGS = -f elf64 -g
 LDFLAGS = 
 
 
-%.o: %.asm meta.asm
+%.o: %.asm meta.inc syscalls.inc
 	$(ASM) $< $(NASMFLAGS) -o $@
 
-%.l: %.asm meta.asm
+%.l: %.asm meta.inc syscalls.inc
 	$(ASM) $< $(NASMFLAGS) -l $@
 
 all: *.o
