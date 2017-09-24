@@ -1,0 +1,12 @@
+%ifndef ASM_LAB_TERMINAL
+%define ASM_LAB_TERMINAL
+;; This module exprots subroutines to change terminal behavior to quickly get
+;; characters, and one to get that character
+
+;; vim: filetype=asm
+
+extern set_term_await
+extern restore_term_setting
+extern getch
+
+%endif
