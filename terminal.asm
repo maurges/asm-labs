@@ -4,6 +4,7 @@
 global set_term_await
 global restore_term_setting
 global getch
+global get_star
 
 
 %include "meta.inc"
@@ -34,35 +35,9 @@ chr:
 
 section .data
 
-;; create two copies of termios needed to set and reset term options
-;; deleted for now as i just reserved them before
-; termios instanses {{{
-;original_termios:
-;  istruc Termios
-;    at .c_iflag,  dd 0
-;    at .c_oflag,  dd 0
-;    at .c_cflag,  dd 0
-;    at .c_lflag,  dd 0
-;    at .c_line,   db 0
-;    at .c_cc,     db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-;                  db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-;    at .c_ispeed, dd 0
-;    at .c_ospeed, dd 0
-;  iend
-;copy_termios:
-;  istruc Termios
-;    at .c_iflag,  dd 0
-;    at .c_oflag,  dd 0
-;    at .c_cflag,  dd 0
-;    at .c_lflag,  dd 0
-;    at .c_line,   db 0
-;    at .c_cc,     db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-;                  db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-;    at .c_ispeed, dd 0
-;    at .c_ospeed, dd 0
-;  iend
-; }}}
-
+;; used to get password symbols
+asterisc:
+	db "*"
 
 section .text
 
@@ -80,11 +55,11 @@ defsub set_term_await
 	;; change settings
 	
 	;; &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON)
-	and [copy_termios + Termios.c_iflag], -1516
+	and dword [copy_termios + Termios.c_iflag], -1516
 	;; &= ~OPOST
-	and [copy_termios + Termios.c_oflag], -2
+	and dword [copy_termios + Termios.c_oflag], -2
 	;; &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN)
-	and [copy_termios + Termios.c_lflag], -32844
+	and dword [copy_termios + Termios.c_lflag], -32844
 	;; &= ~(CSIZE | PARENB)
 	and dword [copy_termios + Termios.c_cflag], -305     
 	;; &= CS8
@@ -115,7 +90,19 @@ endsub
 ; getch {{{
 defsub getch
 	;; reads from stdin into chr one character
-	syscall sys_read, 0, chr, 1
+	sys_call sys_read, 0, chr, 1
+	mov al, [chr]
+endsub
+; }}}
+
+
+;; get one symbol and print asterisc instead of it
+;; to be used when terminal is set to immediately send symbols
+;; *al* - character read
+; get_star {{{
+defsub get_star
+	sys_call sys_read, 0, chr, 1
+	sys_call sys_write, 1, asterisc, 1
 	mov al, [chr]
 endsub
 ; }}}

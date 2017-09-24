@@ -15,7 +15,11 @@ endfun
 
 _start:
 	call set_term_await
-	call getch
+	call get_star
+	call get_star
+	call get_star
+	call get_star
+	call get_star
 	mov [hello_world], al
 	call restore_term_setting
 	sys_call sys_write, 0, hello_world, hwlength
