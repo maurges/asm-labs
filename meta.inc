@@ -192,10 +192,11 @@
 
 
 ;; ending function definition
-
+; endfun {{{
 %macro endfun 0
 	%pop
 %endmacro
+; }}}
 
 
 ;; returning from function
@@ -212,6 +213,48 @@
 	ret
 %endmacro
 
+; }}}
+
+
+;; conditional expression
+; if-else-end {{{
+%macro if 3
+    %push if_context
+    cmp   %1, %3
+    j%-2  %$if_jumpout
+%endmacro
+
+%macro elseif 3
+    %ifctx if_context
+        %$if_jumpout:
+        %pop
+        if %1, %2, %3
+    %else
+        %error "elseif without corresponding if"
+    %endif
+%endmacro
+
+%macro else 0
+    %ifctx if_context
+        %repl else_context
+        jmp   %$if_end
+        %$if_jumpout:
+    %else
+        %error "else without corresponding if"
+    %endif
+%endmacro
+
+%macro endif 0
+    %ifctx if_context
+        %$if_jumpout:
+        %pop
+    %elsectx else_context
+        %$if_end:
+        %pop
+    %else
+        %error "endif without corresponding if"
+    %endif
+%endmacro
 ; }}}
 
 
