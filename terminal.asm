@@ -5,6 +5,8 @@ global set_term_await
 global restore_term_setting
 global getch
 global get_star
+global backspace
+global get_pwd
 
 
 %include "meta.inc"
@@ -37,6 +39,7 @@ copy_termios:
 	resb Termios.size
 chr:
 ; }}}
+
 ; }}}
 
 section .data
@@ -45,6 +48,10 @@ section .data
 ;; used to get password symbols
 asterisc:
 	db "*"
+
+bs_symbols:
+	db 8, ' ', 8
+
 ; }}}
 
 section .text
@@ -98,13 +105,17 @@ endsub
 ; }}}
 
 
-;; get one character from terminal
+;; get one character from terminal; returns 255 for EOF
 ;; *al* - character read
 ; getch {{{
 defsub getch
 	save_all
 	;; reads from stdin into chr one character
 	sys_read 0, chr, 1
+	;;put 255 if end of file reached
+	if rax, e, 0
+	  mov [chr], byte 255
+	endif
 	restore_all
 	mov al, [chr]
 endsub
@@ -122,6 +133,91 @@ defsub get_star
 	restore_all
 	mov al, [chr]
 endsub
+; }}}
+
+
+;; deletes one character from output
+; backspace {{{
+defsub backspace
+	save_all
+	sys_write 1, bs_symbols, 3
+	restore_all
+endsub
+; }}}
+
+
+;; reads N or until newline/eof characters from stream to address and prints asteriscs
+;; returns: rax - number of bytes read
+; get_pwd {{{
+defun get_pwd, ADDR, N
+;;             rdi  rsi
+
+	;; exit if N == 0
+	if N, e, 0
+	  xor rax, rax
+	  return
+	endif
+
+	;; save initial address to compare when deleting
+	mov r15, ADDR
+.loop_start:
+	call getch
+
+	if al, e, 127
+	  ;; delete symbol if was backspace
+	  ;; do nothing if there are no symbols
+	  cmp ADDR, r15
+	  je .loop_start
+	  ;; backspace and position at previous symbol
+	  call backspace
+	  dec ADDR
+	else
+	  ;; write to ADDR otherwise
+;	  stosb
+	  mov [ADDR], al
+	  inc ADDR
+	  dec N
+	  ;; and print asterisc
+	  push rdi
+	  push rsi
+	  sys_write 1, asterisc, 1
+	  pop rsi
+	  pop rdi
+	endif
+
+	;; exit if read all bytes
+	cmp N, 0
+	je .return
+	;; exit if last byte was '\n'
+	cmp al, 10
+	je .return
+	;; or was '\r' (which is sent by my terminal emulator)
+	cmp al, 13
+	je .return
+	;; or was null-char
+	cmp al, 0
+	je .return
+	;; or was end-of-transmission (again, sent by my terminal)
+	cmp al, 0
+	je .return
+	;; or end-of-file
+	cmp al, 255
+	je .return
+
+	;; if was end-of-text (ctrl-c for my terminal), exit program at all
+	cmp al, 3
+	jne .loop_start
+
+	sys_exit 1
+
+
+.return:
+	;; put bytes read to rax
+	mov rax, ADDR
+	sub rax, r15
+
+	return
+endfun
 ; }}}
 
 ; }}}

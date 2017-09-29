@@ -10,5 +10,7 @@ extern set_term_await
 extern restore_term_setting
 extern getch
 extern get_star
+extern backspace
+extern get_pwd
 
 %endif

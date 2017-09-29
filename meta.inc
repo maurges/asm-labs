@@ -272,7 +272,7 @@
     %ifctx if_context
         %$if_jumpout:
         %pop
-    %elsectx else_context
+    %elifctx else_context
         %$if_end:
         %pop
     %else
