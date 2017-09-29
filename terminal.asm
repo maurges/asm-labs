@@ -158,6 +158,9 @@ defun get_pwd, ADDR, N
 	  return
 	endif
 
+	;; setterminal to get symbols at once
+	call set_term_await
+
 	;; save initial address to compare when deleting
 	mov r15, ADDR
 .loop_start:
@@ -171,51 +174,64 @@ defun get_pwd, ADDR, N
 	  ;; backspace and position at previous symbol
 	  call backspace
 	  dec ADDR
-	else
-	  ;; write to ADDR otherwise
-;	  stosb
-	  mov [ADDR], al
-	  inc ADDR
-	  dec N
-	  ;; and print asterisc
-	  push rdi
-	  push rsi
-	  sys_write 1, asterisc, 1
-	  pop rsi
-	  pop rdi
+	  jmp .loop_start
 	endif
+
+	; exits {{{
+	if   al, e, 10
+	orif al, e, 13
+	orif al, e, 0
+	orif al, e, 255
+	orif al, e, 4
+	then
+	  jmp .return
+	endif
+	; }}}
+
+	;; write to ADDR otherwise
+	stosb
+	dec N
+	;; and print asterisc
+	push_regs rax, rdi, rsi
+	sys_write 1, asterisc, 1
+	pop_regs rax, rdi, rsi
 
 	;; exit if read all bytes
 	cmp N, 0
 	je .return
-	;; exit if last byte was '\n'
-	cmp al, 10
-	je .return
-	;; or was '\r' (which is sent by my terminal emulator)
-	cmp al, 13
-	je .return
-	;; or was null-char
-	cmp al, 0
-	je .return
-	;; or was end-of-transmission (again, sent by my terminal)
-	cmp al, 0
-	je .return
-	;; or end-of-file
-	cmp al, 255
-	je .return
 
-	;; if was end-of-text (ctrl-c for my terminal), exit program at all
-	cmp al, 3
-	jne .loop_start
-
-	sys_exit 1
+	jmp .loop_start
 
 
 .return:
+	;; restore settings we set at the beginning
+	call restore_term_setting
+
 	;; put bytes read to rax
 	mov rax, ADDR
 	sub rax, r15
+	push rax
+	;; set counter in rcx and save it
+	mov rcx, rax
+	push rcx
 
+	;; clear screen from asteriscs
+	;; position at start of line
+	mov [chr], byte 13
+	sys_write 1, chr, 1
+	;; type spaces for all symbols entered
+	mov [chr], byte ' '
+	;; restore counter set previuosly
+	pop rcx
+.spaces:	push rcx
+	sys_write 1, chr, 1
+	pop rcx
+	loop .spaces
+	;; and position at start of line once more
+	mov [chr], byte 13
+	sys_write 1, chr, 1
+
+	pop rax
 	return
 endfun
 ; }}}
