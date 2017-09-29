@@ -49,6 +49,29 @@
 ;; }}}
 
 
+;; set of macros to push registers
+; push/pop regs {{{
+%macro push_regs 1-*
+    %rep %0
+        push %1
+        %rotate 1
+    %endrep
+%endmacro
+%macro pop_regs 1-*
+    %rep %0
+        %rotate -1
+        pop %1
+    %endrep
+%endmacro
+%macro save_all 0
+    push_regs rax, rcx, rdx, rsi, rdi, r8, r9, r10, r11
+%endmacro
+%macro restore_all 0
+    pop_regs rax, rcx, rdx, rsi, rdi, r8, r9, r10, r11
+%endmacro
+; }}}
+
+
 ;; macros to put arguments for syscalls
 ; syscallargs {{{
 
@@ -203,6 +226,7 @@
 ; return {{{
 
 %macro return 0
+    mov rsp, rbp
 	pop rbp
 	ret
 %endmacro
