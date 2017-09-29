@@ -11,6 +11,7 @@ global get_star
 %include "syscalls.inc"
 
 section .bss
+; bss {{{
 
 ;; copy of c's termios structure as found in my /usr/include/bits/termios.h
 ; termios {{{
@@ -27,30 +28,39 @@ struc Termios
 endstruc
 ; }}}
 
+
+;; memory used by some subroutines
+; reserved {{{
 original_termios:
 	resb Termios.size
 copy_termios:
 	resb Termios.size
 chr:
+; }}}
+; }}}
 
 section .data
+; data {{{
 
 ;; used to get password symbols
 asterisc:
 	db "*"
+; }}}
 
 section .text
+; text {{{
 
 ;; sets terminal to a mode where it sends one symbol right after it's typed
 ; set_term_await {{{
 defsub set_term_await
+	save_all
 
 	;; fetch current terminal settings
 
 	;; TCGETS for stdin, write to original_termios
-	sys_call sys_ioctl, 0, 21505, original_termios
+	sys_ioctl 0, 21505, original_termios
 	;; fetch a copy to make changes in to
-	sys_call sys_ioctl, 0, 21505, copy_termios
+	sys_ioctl 0, 21505, copy_termios
 
 	;; change settings
 	
@@ -68,8 +78,9 @@ defsub set_term_await
 	;; set the settings we've changed
 
 	;; TCSETS for stdin from copy_termios
-	sys_call sys_ioctl, 0, 21506, copy_termios
+	sys_ioctl 0, 21506, copy_termios
 
+	restore_all
 endsub
 ; }}}
 
@@ -77,10 +88,12 @@ endsub
 ;; restores the settings we mixed up with the above subroutine
 ; restore_term_setting {{{
 defsub restore_term_setting
+	push_regs rax, rcx, rdx, rsi, rdi, r8, r9, r10, r11
 	;; ONLY CALL AFTER set_term_await! Undefined behavior otherwise
 	;; simpy set the settings we stored before
 
-	sys_call sys_ioctl, 0, 21506, original_termios
+	sys_ioctl 0, 21506, original_termios
+	restore_all
 endsub
 ; }}}
 
@@ -89,8 +102,10 @@ endsub
 ;; *al* - character read
 ; getch {{{
 defsub getch
+	save_all
 	;; reads from stdin into chr one character
-	sys_call sys_read, 0, chr, 1
+	sys_read 0, chr, 1
+	restore_all
 	mov al, [chr]
 endsub
 ; }}}
@@ -101,8 +116,12 @@ endsub
 ;; *al* - character read
 ; get_star {{{
 defsub get_star
-	sys_call sys_read, 0, chr, 1
-	sys_call sys_write, 1, asterisc, 1
+	save_all
+	sys_read 0, chr, 1
+	sys_write 1, asterisc, 1
+	restore_all
 	mov al, [chr]
 endsub
+; }}}
+
 ; }}}
