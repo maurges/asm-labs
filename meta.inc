@@ -248,13 +248,48 @@
     j%-2  %$if_jumpout
 %endmacro
 
+%macro andif 3
+    %ifctx if_context
+        cmp  %1, %3
+        j%-2 %$if_jumpout
+    %else
+        %error "using andif without if"
+    %endif
+%endmacro
+
+%macro orif 3
+    %ifctx if_context
+        %repl orif_context
+        jmp %$orif_holds
+       %$if_jumpout:
+        cmp %1, %3
+        j%+2 %$orif_holds
+    %elifctx orif_context
+        cmp %1, %3
+        j%+2 %$orif_holds
+    %else
+        error "using orif without if"
+    %endif
+%endmacro
+
+%macro then 0
+    %ifctx if_context
+        ;; pass
+    %elifctx orif_context
+        jmp %$if_end
+       %$orif_holds:
+    %else
+        %error "can only use then with if/andif/orif"
+    %endif
+%endmacro
+
 %macro elseif 3
     %ifctx if_context
-        %$if_jumpout:
+       %$if_jumpout:
         %pop
         if %1, %2, %3
     %else
-        %error "elseif without corresponding if"
+        %error "elseif without corresponding if (or elseif with orif/andif)"
     %endif
 %endmacro
 
@@ -262,9 +297,9 @@
     %ifctx if_context
         %repl else_context
         jmp   %$if_end
-        %$if_jumpout:
+       %$if_jumpout:
     %else
-        %error "else without corresponding if"
+	    %error "else without corresponding if (or else with orif/andif)"
     %endif
 %endmacro
 
@@ -275,11 +310,13 @@
     %elifctx else_context
         %$if_end:
         %pop
+    %elifctx orif_context
+        %$if_end:
+        %pop
     %else
         %error "endif without corresponding if"
     %endif
 %endmacro
 ; }}}
-
 
 %endif
