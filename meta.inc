@@ -319,4 +319,32 @@
 %endmacro
 ; }}}
 
+
+;; easily print const string
+; puts/die {{{
+%macro puts 1+
+    jmp %%endstr
+   %%str: db %1
+   %%endstr:
+    sys_write 1, %%str, %%endstr - %%str
+%endmacro
+
+%macro die 1+
+    sys_write 0, %%str, %%endstr - %%str
+    sys_exit 1
+    %%str: db %1
+	%%endstr:
+%endmacro
+; }}}
+
+
+;; define const string in text section
+; defstr {{{
+%macro defstr 2+
+    jmp %%end
+   %1: db %2
+   %%end:
+%endmacro
+; }}}
+
 %endif
