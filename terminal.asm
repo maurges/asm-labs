@@ -151,10 +151,13 @@ endsub
 ; get_pwd {{{
 defun get_pwd, ADDR, N
 ;;             rdi  rsi
+	;; save non-volatile registers used
+	push_regs r15
 
 	;; exit if N == 0
 	if N, e, 0
 	  xor rax, rax
+	  pop_regs r15
 	  return
 	endif
 
@@ -232,6 +235,7 @@ defun get_pwd, ADDR, N
 	sys_write 1, chr, 1
 
 	pop rax
+	pop_regs r15
 	return
 endfun
 ; }}}
