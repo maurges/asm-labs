@@ -2,27 +2,21 @@
 %include "syscalls.inc"
 
 %include "terminal.asmh"
+%include "vigenere/main.asmh"
 
 global _start
 
 
 section .text
+; text {{{
 
 _start:
 
-	cld
-
-	vcall get_pwd, hello_world, hwlength
-	;; save length for later
-	mov r15, rax
-	;; no CR symbol plz
-	mov [hello_world + rax], byte 10
-	inc r15
-
-	sys_write 1, hello_world, r15
+	call VigenereCipher
 
 	sys_exit 0
 
+; }}}
 
 section .data
 ; data {{{

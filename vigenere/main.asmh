@@ -1,0 +1,8 @@
+%ifndef AMS_LABS_VIGENERE_MAIN
+%define AMS_LABS_VIGENERE_MAIN
+
+;; This file defines routines to encrypt file by key
+
+extern VigenereCipher
+
+%endif

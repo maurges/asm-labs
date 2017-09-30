@@ -1,10 +1,43 @@
+;; This file defines routines to encrypt file by key
+
+global VigenereCipher
+
+%include "meta.inc"
+%include "syscalls.inc"
+%include "files.asmh"
+%include "terminal.asmh"
+
+section .bss
+; bss {{{
+pre_key: resb 1024
+
+; }}}
+
 section .text
+; text {{{
+
+;; if bl is a letter, return its alphabet position
+; ToPosition {{{
+defsub ToPosition
+	if    bl, ge, 'a'
+	andif bl, le, 'z'
+	  sub bl, 'a'
+	  ret
+	elseif bl, ge, 'A'
+	andif  bl , le, 'Z'
+	  sub bl, 'A'
+	  ret
+	else
+	  die "Not an an alphabetic symbol in ToPosition"
+	endif
+endsub
+; }}}
 
 ;; if al is letter, return its alphabet position
 ;; and set rdx to 1 if was uppercase
 ;; if was not letter, set rdx to 2
-; ToLower {{{
-defsub ToPosition
+; ToPositionWithFlag {{{
+defsub ToPositionWithFlag
 	xor rdx, rdx
 	if     al, ge, 'a'
 	andif  al, le, 'z'
@@ -42,8 +75,11 @@ endsub
 ; }}}
 
 
-; VigenereMain {{{
+; VigenereCipher {{{
 defsub VigenereCipher
+	cld
+	;; open files
+
 	defstr src_file, "source.txt"
 	sys_open src_file, FlagR
 	mov r15, rax ;; r15 - descriptor of read
@@ -52,13 +88,34 @@ defsub VigenereCipher
 	sys_open dst_file, FlagW
 	mov r14, rax ;; r14 - descriptor of write
 
-	vcall get_pwd, utl_text, FileMaxsize
-	mov r13, rax ;; r13 - size of key
-	if r13, e, 0
-	  die "Key length mustn't be zero!"
-	endif
 
-	cld
+	;; get key
+	vcall get_pwd, pre_key, FileMaxsize
+	mov r13, rax ;; r13 - size of key
+
+  ; loop_key {{{
+	;; leave only alphabetic symbols in key
+	mov rsi, pre_key
+	mov rdi, utl_text
+	mov rcx, r13
+  .loop_key:
+	lodsb
+	call ToPositionWithFlag
+	;; if was not letter
+	if rdx, e, 2
+	  ;; decrease length of key
+	  dec r13
+	else
+	  stosb
+	endif
+	loop .loop_key
+
+	if r13, e, 0
+	  die "Key should contain at least one letter!"
+	endif
+  ; }}}
+
+
   ; loop_blocks {{{
   .loop_blocks:
 	;; while still something left to read
@@ -74,16 +131,44 @@ defsub VigenereCipher
 
   ; loop_chars {{{
   .loop_chars:
+	;; get next text symbol
 	lodsb
-	call ToLower
+	call ToPositionWithFlag
+
 	;; skip non-alphabetical symbols
 	if rdx, e, 2
 	  stosb
-	  loop .loop_chars
+	else
+	  ;; get next key symbol
+	  mov bl, [utl_text + r12]
+	  inc r12
+	  ;; cipher al by bl by modulo 26
+	  add al, bl
+	  if al, g, 26
+	    sub al, 26
+	  endif
+	  ;; write symbol to ciphertext
+	  stosb
+	  ;; check if key index is within bounds
+	  if r12, ge, r13
+	    sub r12, r13
+	  endif
 	endif
+
+	;; will loop by rcx set above as number of bytes read
+	loop .loop_chars
+	;; if bytes are done, write them
+	sys_write r14, dst_text, FileMaxsize
+	;; and repeat with next chunk
+	jmp .loop_blocks
 	
   ; }}}
   ; }}}
-	  
+  ;; goes here after all blocks are done
+  .loop_end:
+	sys_close r15
+	sys_close r14
 endsub
 ; }}}
+
+;}}}
