@@ -9,5 +9,5 @@ LDFLAGS =
 %.l: %.asm meta.inc syscalls.inc
 	$(ASM) $< $(NASMFLAGS) -l $@
 
-all: *.o
+all: *.o */*.o
 	ld -o main $^
