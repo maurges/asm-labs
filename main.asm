@@ -12,7 +12,36 @@ section .text
 
 _start:
 
-	call VigenereCipher
+	puts "Encrypt or decrypt? e/d > "
+  .loop:
+  	call getch
+  	;; get CR symbol
+  	push rax
+  	call getch
+  	pop rax
+
+  	if     rax, e, 'e'
+  	orif   rax, e, 'E'
+  	then
+  	  mov r15, 0
+  	  jmp .endloop
+  	endif
+
+  	if rax, e, 'd'
+  	orif   rax, e, 'D'
+  	then
+  	  mov r15, 1
+  	  jmp .endloop
+  	endif
+
+  	puts "Please answer E or D! > "
+  	jmp .loop
+
+  .endloop:
+
+	puts "Processing file source.txt...", 10
+	vcall VigenereCipher, r15
+	puts "Done. Written to dest.txt", 10
 
 	sys_exit 0
 
@@ -20,15 +49,4 @@ _start:
 
 section .data
 ; data {{{
-
-hello_world:
-	db "hello tupoy pidor", 10
-hwlength equ $ - hello_world
-
-output:
-	db "you entered: "
-your_char:
-	db 'Y', 10
-textlength equ $ - output
-
 ; }}}
