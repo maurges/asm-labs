@@ -38,6 +38,7 @@ original_termios:
 copy_termios:
 	resb Termios.size
 chr:
+	resb 1
 ; }}}
 
 ; }}}
