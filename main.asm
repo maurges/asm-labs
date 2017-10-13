@@ -13,6 +13,8 @@ section .text
 
 _start:
 
+%define PROGRAM_BEHAVIOR 'StrStr'
+
  %ifndef PROGRAM_BEHAVIOR
    sys_exit 0
  %else
@@ -57,10 +59,26 @@ _start:
 	puts "input haystack: "
 	sys_read 0, haystack, 1023
 	mov [haystack + rax], byte 0
+	;; save haystack length
+	mov r15, rax
+
 	puts "input needle: "
 	sys_read 0, needle, 1023
 	mov [needle + rax], byte 0
+
+	vcall StrStr, haystack, needle
+	puts "found at: ", 10, " "
+	sys_write 1, haystack, r15
+	puts 10
+	mov rcx, r15
+.spacesloop:
+	puts " "
+	loop .spacesloop
+	puts "^", 10
+
+	sys_exit 0
  ; }}}
+ %endif
  %endif
 
 ; }}}
