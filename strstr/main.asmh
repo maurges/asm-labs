@@ -1,0 +1,10 @@
+%ifndef AMS_LABS_STRSTR_MAIN
+%define AMS_LABS_STRSTR_MAIN
+
+;; This file contains function to determine the position the substring
+;; has in haystack
+;; vim: filetype=asm
+
+extern StrStr
+
+%endif

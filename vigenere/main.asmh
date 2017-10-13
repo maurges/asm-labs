@@ -1,7 +1,8 @@
-%ifndef AMS_LABS_VIGENERE_MAIN
-%define AMS_LABS_VIGENERE_MAIN
+%ifndef ASM_LABS_VIGENERE_MAIN
+%define ASM_LABS_VIGENERE_MAIN
 
 ;; This file defines routines to encrypt file by key
+;; vim: filetype=asm
 
 extern VigenereCipher
 

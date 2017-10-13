@@ -3,6 +3,7 @@
 
 %include "terminal.asmh"
 %include "vigenere/main.asmh"
+%include "strstr/main.asmh"
 
 global _start
 
@@ -11,6 +12,12 @@ section .text
 ; text {{{
 
 _start:
+
+ %ifndef PROGRAM_BEHAVIOR
+   sys_exit 0
+ %else
+ %ifidn PROGRAM_BEHAVIOR, 'vigenere'
+ ; vigenere {{{
 
 	puts "Encrypt or decrypt? e/d > "
   .loop:
@@ -44,9 +51,27 @@ _start:
 	puts "Done. Written to dest.txt", 10
 
 	sys_exit 0
+ ; }}}
+ %elifidn PROGRAM_BEHAVIOR, 'StrStr'
+ ; strstr {{{
+	puts "input haystack: "
+	sys_read 0, haystack, 1023
+	mov [haystack + rax], byte 0
+	puts "input needle: "
+	sys_read 0, needle, 1023
+	mov [needle + rax], byte 0
+ ; }}}
+ %endif
 
 ; }}}
 
 section .data
 ; data {{{
+; }}}
+
+section .bss
+; bss {{{
+haystack: resb 1024
+needle:   resb 1024
+
 ; }}}
