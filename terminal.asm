@@ -226,11 +226,14 @@ defun get_pwd, ADDR, N
 	mov [chr], byte ' '
 	;; restore counter set previuosly
 	pop rcx
+	;; leave immideately if zero
+	cmp rcx, 0
+	je .endspcs
 .spaces:	push rcx
 	sys_write 1, chr, 1
 	pop rcx
 	loop .spaces
-	;; and position at start of line once more
+.endspcs:	;; and position at start of line once more
 	mov [chr], byte 13
 	sys_write 1, chr, 1
 
