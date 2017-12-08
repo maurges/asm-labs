@@ -4,7 +4,7 @@
 ;; this modules exports functions and constants to easily manipulate files
 ;; by reading/writing 1024 bytes of data
 
-;; vim: filetype=asm
+;; vim: filetype=nasm
 
 extern src_text
 extern dst_text

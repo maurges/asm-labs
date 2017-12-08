@@ -1,6 +1,8 @@
 ;; This file contains function to determine the position the substring
 ;; has in haystack
 
+;; vim:filetype=nasm
+
 global StrStr
 
 %include "meta.inc"
