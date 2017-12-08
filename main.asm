@@ -58,21 +58,38 @@ _start:
  ; strstr {{{
 	puts "input haystack: "
 	sys_read 0, haystack, 1023
+	dec rax
 	mov [haystack + rax], byte 0
 	;; save haystack length
 	mov r15, rax
 
 	puts "input needle: "
 	sys_read 0, needle, 1023
+	dec rax
 	mov [needle + rax], byte 0
 
 	vcall StrStr, haystack, needle
-	puts "found at: ", 10, " "
+
+	if rax, e, -1
+	  puts "not found", 10
+	  sys_exit 0
+	endif
+
+	mov r14, rax
+
+	puts "found at: ", 10
 	sys_write 1, haystack, r15
 	puts 10
-	mov rcx, r15
+	mov rcx, r14
+	;; KOSTYL
+	if r14, e, 0
+	  puts "^", 10
+	  sys_exit 0
+	endif
 .spacesloop:
+	mov r14, rcx
 	puts " "
+	mov rcx, r14
 	loop .spacesloop
 	puts "^", 10
 
