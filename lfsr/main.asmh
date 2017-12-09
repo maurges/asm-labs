@@ -1,0 +1,13 @@
+%ifndef ASM_LABS_LFSR_MAIN
+%define ASM_LABS_LFSR_MAIN
+
+;; This file has subroutines to initialize random generator and generate
+;; numbers with lfsr-generator
+;; vim: filetype=nasm
+
+extern add_tap
+extern set_length
+extern set_base_lfsr
+extern lfsr_next
+
+%endif

@@ -3,6 +3,12 @@
 
 ;; vim: filetype=nasm
 
+global add_tap
+global set_length
+global set_base_lfsr
+global lfsr_next
+
+
 %include "meta.inc"
 %include "syscalls.inc"
 
@@ -58,6 +64,9 @@ endfun
 
 ; lfsr_next {{{
 defsub lfsr_next
+	push rbp
+	mov rbp, rsp
+	push_regs rbx, rcx, rdx, r8, r9, r10, r11, r12, r13, r14, r15
 	;; put current lfsr value to quick access
 	mov rax, [current_lfsr]
 	;; prepare the bit
@@ -101,6 +110,8 @@ defsub lfsr_next
 	shl r8,  cl
 	pop rcx
 	or rax,  r8
+	pop_regs rbx, rcx, rdx, r8, r9, r10, r11, r12, r13, r14, r15
+	pop rbp
 endsub
 ; }}}
 
