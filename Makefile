@@ -1,6 +1,6 @@
 ASM = nasm
 NASMFLAGS = -f elf64 -g
-LDFLAGS = 
+LDFLAGS = -lstdio -I /lib/ld-linux.so.2
 
 
 %.o: %.asm meta.inc syscalls.inc
@@ -10,4 +10,5 @@ LDFLAGS =
 	$(ASM) $< $(NASMFLAGS) -l $@
 
 all: *.o */*.o
-	ld -o main $^
+# 	ld $(LDFLAGS) -o main $^
+	gcc -o main main.c $^
