@@ -4,16 +4,19 @@
 %include "terminal.asmh"
 %include "vigenere/main.asmh"
 %include "strstr/main.asmh"
+%include "lfsr/main.asmh"
 
-global _start
+extern printf
+
+global main
 
 
 section .text
 ; text {{{
 
-_start:
+main:
 
-%define PROGRAM_BEHAVIOR 'StrStr'
+%define PROGRAM_BEHAVIOR 'lfsr'
 
  %ifndef PROGRAM_BEHAVIOR
    sys_exit 0
@@ -95,6 +98,27 @@ _start:
 
 	sys_exit 0
  ; }}}
+ %elifidn PROGRAM_BEHAVIOR, 'lfsr'
+ ; strstr {{{
+	vcall set_length, 16
+	vcall add_tap, 0
+	vcall add_tap, 2
+	vcall add_tap, 3
+	vcall add_tap, 5
+	mov rbx, 0xace1
+	vcall set_base_lfsr, rbx
+	mov rcx, 0
+.loop:	push rbx
+	push rcx
+	call lfsr_next
+	pop rcx
+	pop rbx
+	inc rcx
+	cmp rbx, rax
+	jne .loop
+	vcall printf, format, rcx
+	sys_exit 0
+ ; }}}
  %endif
  %endif
 
@@ -102,6 +126,7 @@ _start:
 
 section .data
 ; data {{{
+format:	db "%d\n"
 ; }}}
 
 section .bss
@@ -110,3 +135,5 @@ haystack: resb 1024
 needle:   resb 1024
 
 ; }}}
+
+;; vim: filetype=nasm
