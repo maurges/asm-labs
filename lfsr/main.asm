@@ -43,6 +43,7 @@ defun add_tap, pos
 	mov [taps + rsi], dil
 	inc rsi
 	mov [taps_amount], sil
+	return
 endfun
 ; }}}
 
@@ -50,7 +51,10 @@ endfun
 ; set_length {{{
 defun set_length, len
 ;;                rdi
+	puts "yo", 10
 	mov [length], dil
+	puts "man", 10
+	return
 endfun
 ; }}}
 
@@ -58,6 +62,7 @@ endfun
 ; set_base_lfsr {{{
 defun set_base_lfsr, value
 	mov [current_lfsr], value
+	return
 endfun
 ; }}}
 
@@ -112,6 +117,7 @@ defsub lfsr_next
 	or rax,  r8
 	pop_regs rbx, rcx, rdx, r8, r9, r10, r11, r12, r13, r14, r15
 	pop rbp
+	ret
 endsub
 ; }}}
 
