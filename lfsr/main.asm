@@ -51,9 +51,7 @@ endfun
 ; set_length {{{
 defun set_length, len
 ;;                rdi
-	puts "yo", 10
 	mov [length], dil
-	puts "man", 10
 	return
 endfun
 ; }}}
@@ -80,7 +78,7 @@ defsub lfsr_next
 	xor r14,  r14
 	mov r14b, [length]
 	dec r14
-	;; set r15 to be a bit masc for our length
+	;; set r15 to be a bit mask for our length
 	mov r15, 1
 	push rcx
 	mov rcx, r14
@@ -90,6 +88,7 @@ defsub lfsr_next
 
 	;; start the taps cycle
 	mov rsi, taps
+	xor rcx, rcx
 	mov cl, [taps_amount]
 .taps_cycle:
 	;; current tap index
@@ -115,9 +114,9 @@ defsub lfsr_next
 	shl r8,  cl
 	pop rcx
 	or rax,  r8
+	mov [current_lfsr], rax
 	pop_regs rbx, rcx, rdx, r8, r9, r10, r11, r12, r13, r14, r15
-	pop rbp
-	ret
+	return [current_lfsr]
 endsub
 ; }}}
 
