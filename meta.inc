@@ -233,6 +233,7 @@
 
 %macro return 1
 	mov rax, %1
+	mov rsp, rbp
 	pop rbp
 	ret
 %endmacro
