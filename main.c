@@ -8,7 +8,8 @@ uint64_t lfsr_next(void);
 
 int main()
 {
-	set_length(16);
+	uint64_t length = 16;
+	set_length(length);
 	add_tap(0);
 	add_tap(2);
 	add_tap(3);
@@ -23,5 +24,9 @@ int main()
 		counter += 1;
 	}
 	printf("%d\n", counter);
+	if (counter == (1u << length) -1)
+	{
+		printf("counter is exactly 2^%d - 1\n", length);
+	}
 	return 0;
 }
