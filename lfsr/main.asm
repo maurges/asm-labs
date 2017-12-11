@@ -36,37 +36,51 @@ section .text
 ; .text {{{
 
 ; add_tap {{{
-defun add_tap, pos
-;;             rdi
+;; function add_tap ARGS: pos - rdi
+add_tap:
+	push rbp
+	mov rbp, rsp
 	xor rsi, rsi
 	mov sil, [taps_amount]
 	mov [taps + rsi], dil
 	inc rsi
 	mov [taps_amount], sil
-	return
-endfun
+	mov rsp, rbp
+	pop rbp
+	ret
+;; end function
 ; }}}
 
 
 ; set_length {{{
-defun set_length, len
-;;                rdi
+;; function set_length ARGS len - rdi
+set_length:
+	push rbp
+	mov rbp, rsp
 	mov [length], dil
-	return
-endfun
+	mov rsp, rbp
+	pop rbp
+	ret
+;; end function
 ; }}}
 
 
 ; set_base_lfsr {{{
-defun set_base_lfsr, value
-	mov [current_lfsr], value
-	return
-endfun
+;; function set_base_lfsr ARGS value
+set_base_lfsr:
+	push rbp
+	mov rbp, rsp
+	mov [current_lfsr], rdi
+	mov rsp, rbp
+	pop rbp
+	ret
+;; end function
 ; }}}
 
 
 ; lfsr_next {{{
-defsub lfsr_next
+;; function lfsr_next
+lfsr_next:
 	push rbp
 	mov rbp, rsp
 	push_regs rbx, rcx, rdx, r8, r9, r10, r11, r12, r13, r14, r15
@@ -116,8 +130,11 @@ defsub lfsr_next
 	or rax,  r8
 	mov [current_lfsr], rax
 	pop_regs rbx, rcx, rdx, r8, r9, r10, r11, r12, r13, r14, r15
-	return [current_lfsr]
-endsub
+	mov rsp, rbp
+	pop rbp
+	mov rax, [current_lfsr]
+	ret
+;; end function
 ; }}}
 
 ; }}}
