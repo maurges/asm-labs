@@ -1,0 +1,7 @@
+.*.swp
+.tags
+*/*.o
+*/*.l
+*/.*.swp
+*/.tags
+*/main
