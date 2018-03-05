@@ -1,0 +1,11 @@
+%ifndef ASM_LABS_SOCKET
+%define ASM_LABS_SOCKET
+
+;; functions to create and used TCP sockets, thin-wrappers against the syscall
+;; all cdecl so can be used from C
+;; vim: ft=nasm
+
+extern TCPSocketNewBind
+extern TCPSocketClose
+
+%endif
