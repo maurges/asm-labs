@@ -10,7 +10,7 @@ section .text
 ; .text {{{
 
 ; TCPSocketNewBind {{{
-;; subroutine
+;; subroutine RETURNS sockfd
 TCPSocketNewBind:
 	push ebp
 	mov ebp, esp
@@ -62,11 +62,44 @@ TCPSocketNewBind:
 	mov ecx, esp  ;; function args
 	int 0x80
 
+	;; turn the socket into a listening socket
+
+	push 0   ;; queue size
+	push edx ;; socket fd
+
+	mov eax, 0x66 ;; sys_socketcall
+	mov ebx, 4    ;; sys_listen
+	mov ecx, esp  ;; function args
+
 	;; return the socket fd
 	mov eax, edx
 	mov esp, ebp
 	pop ebp
 	ret
+; }}}
+
+; TCPSocketAccept {{{
+;; function TCPSocketAccept ARGS cdecl: sockfd
+TCPSocketAccept:
+	push ebp
+	mov ebp, esp
+	;; sockfd
+	mov eax, [ebp+8]
+
+	;; call sys_accept
+	push 0   ;; structure length
+	push 0   ;; no structure (of length above)
+	push eax ;; sockfd
+
+	mov eax, 0x66 ;; sys_socketcall
+	mov ebx, 5    ;; sys_accept
+	mov ecx, esp  ;; function args
+	int 0x80
+
+	mov esp, ebp
+	pop ebp
+	ret
+	
 ; }}}
 
 ; TCPSocketClose {{{
