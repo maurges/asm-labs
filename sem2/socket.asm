@@ -29,6 +29,8 @@ section .text
 ;; subroutine RETURNS sockfd
 TCPSocketNewBind:
 	push ebp
+	push ebx
+	push esi
 	mov ebp, esp
 
 	;; sys_socket arguments:
@@ -100,6 +102,8 @@ TCPSocketNewBind:
 	;; return the socket fd
 	mov eax, edx
 	mov esp, ebp
+	pop esi
+	pop ebx
 	pop ebp
 	ret
 ; }}}
@@ -108,6 +112,7 @@ TCPSocketNewBind:
 ;; function TCPSocketAccept ARGS cdecl: sockfd
 TCPSocketAccept:
 	push ebp
+	push ebx
 	mov ebp, esp
 	;; sockfd
 	mov eax, [ebp+8]
@@ -123,6 +128,7 @@ TCPSocketAccept:
 	int 0x80
 
 	mov esp, ebp
+	pop ebx
 	pop ebp
 	ret
 	
@@ -131,9 +137,13 @@ TCPSocketAccept:
 ; TCPSocketClose {{{
 ;; function TCPSocketClose ARGS cdecl: file_descriptor
 TCPSocketClose:
+	push ebx
+
 	mov eax, 6         ;; sys_close
 	mov ebx, [esp + 4] ;; argument
 	int 0x80
+
+	pop ebx
 	ret
 ; }}}
 
