@@ -18,13 +18,28 @@ _start:
 	call TCPSocketAccept
 	mov [ebp-8], eax
 
+	;; fork and go
+	mov eax, 2
+	int 0x80
+	cmp eax, 0
+	je .parent
+
 	push dword [ebp-8]
 	call loopread
+	jmp .exit
+
+.parent:
+	;; wait for children to terminate
+	mov eax, 7  ;; sys_waitpid
+	mov ebx, -1 ;; all children
+	mov ecx, 0  ;; no wstatus
+	mov edx, 0  ;; no flags
+	int 0x80
 
 	push dword [ebp-4]
 	call TCPSocketClose
 
-	mov eax, 1
+.exit:	mov eax, 1
 	mov ebx, 0
 	int 0x80
 ; }}}
