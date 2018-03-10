@@ -48,11 +48,13 @@ TCPSocketNewBind:
 
 	;; set sock_reuseaddr to avoid some segfaults when socket is not
 	;; ready
-	push 4    ;; sizeof socklen_t
-	push esp  ;; address of socklen_t - on the stack
-	push 2    ;; SO_REUSEADDR = 2
-	push 1    ;; SOL_SOCKET = 1
-	push edx  ;; sockfd
+	push 1   ;; value to be set: True
+	mov eax, esp ;; remember the place of the value we put
+	push 4   ;; sizeof bool
+	push eax ;; address of socklen_t - on the stack
+	push 2   ;; optname: SO_REUSEADDR = 2
+	push 1   ;; SOL_SOCKET = 1
+	push edx ;; sockfd
 
 	mov eax, 0x66 ;; sys_socketcall
 	mov ebx, 14    ;; sys_getsockopt
