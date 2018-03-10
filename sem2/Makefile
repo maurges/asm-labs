@@ -2,6 +2,8 @@ ASM = nasm
 NASMFLAGS = -f elf -g
 LDFLAGS = -m elf_i386
 
+all: echo
+
 %.o: %.asm
 	$(ASM) $< $(NASMFLAGS) -o $@
 
