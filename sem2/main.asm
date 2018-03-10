@@ -18,26 +18,53 @@ _start:
 	call TCPSocketAccept
 	mov [ebp-8], eax
 
-	mov eax, 3
-	mov ebx, [ebp-8]
-	mov ecx, gotstr
-	mov edx, gotstr_len
-	int 0x80
-
-	mov eax, 4
-	mov ebx, [ebp-8]
-	mov ecx, greetstr
-	mov edx, greetstr_len
-	int 0x80
-
 	push dword [ebp-8]
-	call TCPSocketClose
+	call loopread
+
 	push dword [ebp-4]
 	call TCPSocketClose
 
 	mov eax, 1
 	mov ebx, 0
 	int 0x80
+; }}}
+
+; loopread {{{
+;; function loopread ARGS cdecl: sockfd
+loopread:
+	push ebp
+	push ebx
+	mov ebp, esp
+
+	sub esp, 256 ;; buffer of 256 symbols
+
+.loop:	;; try to read
+	mov eax, 3
+	mov ebx, [ebp+8]
+	mov ecx, esp
+	mov edx, 256
+	int 0x80
+
+	test eax, eax
+	jz .end
+
+	mov edx, eax ;; length first
+	mov eax, 4
+	mov ebx, [ebp+8]
+	mov ecx, esp
+	int 0x80
+
+	jmp .loop
+
+.end:	;; close socket
+	push dword [ebp+8]
+	call TCPSocketClose
+
+	mov esp, ebp
+	pop ebx
+	pop ebp
+	ret
+	
 ; }}}
 
 ; }}}
