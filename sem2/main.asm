@@ -40,7 +40,7 @@ loopread:
 
 .loop:	;; try to read
 	mov eax, 3
-	mov ebx, [ebp+8]
+	mov ebx, [ebp+12]
 	mov ecx, esp
 	mov edx, 256
 	int 0x80
@@ -50,14 +50,14 @@ loopread:
 
 	mov edx, eax ;; length first
 	mov eax, 4
-	mov ebx, [ebp+8]
+	mov ebx, [ebp+12]
 	mov ecx, esp
 	int 0x80
 
 	jmp .loop
 
 .end:	;; close socket
-	push dword [ebp+8]
+	push dword [ebp+12]
 	call TCPSocketClose
 
 	mov esp, ebp
