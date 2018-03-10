@@ -10,6 +10,7 @@ _start:
 	call TCPSocketNewBind
 
 	push eax
+	call TCPSocketAccept
 	call TCPSocketClose
 
 	mov eax, 1

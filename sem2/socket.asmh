@@ -7,5 +7,6 @@
 
 extern TCPSocketNewBind
 extern TCPSocketClose
+extern TCPSocketAccept
 
 %endif
