@@ -5,6 +5,22 @@
 
 global TCPSocketNewBind
 global TCPSocketClose
+global TCPSocketAccept
+
+section .bss
+; .bss {{{
+
+; sockaddr_in {{{
+struc sockaddr_in
+  .sin_family: resw 1
+  .sin_port:   resw 1
+  .sin_addr:   resd 1
+  .sin_zero:   resb 8
+  .size:
+endstruc
+; }}}
+
+; }}}
 
 section .text
 ; .text {{{
@@ -48,12 +64,15 @@ TCPSocketNewBind:
 	;; bind the socket with the address type
 
 	;; build the sockaddr_in type
-	push 0           ;; INADDR_ANY = 0 (uint32_t)
-	push word 0x672b ;; port in byte reverse order = 11111 (uint16_t)
-	push word 2      ;; AF_INET = 2 (unsigned short int)
+	sub esp, sockaddr_in.size
+	mov [esp + sockaddr_in.sin_addr], dword 0
+	mov [esp + sockaddr_in.sin_port], word 0xa1ed
+	mov [esp + sockaddr_in.sin_family], word 2
+	mov [esp + sockaddr_in.sin_zero], dword 0
+	mov [esp + sockaddr_in.sin_zero + 4], dword 0
 	mov esi, esp     ;; save the struct pointer
 	;; arguments for bind
-	push 16  ;; sockaddr struct size
+	push sockaddr_in.size
 	push esi ;; sockaddr_in struct pointer
 	push edx ;; socket fd
 
