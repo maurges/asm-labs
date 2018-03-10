@@ -55,7 +55,7 @@ TCPSocketNewBind:
 	push edx  ;; sockfd
 
 	mov eax, 0x66 ;; sys_socketcall
-	mov ebx, 4    ;; sys_getsockopt
+	mov ebx, 14    ;; sys_getsockopt
 	mov ecx, esp  ;; function args
 	int 0x80
 
@@ -81,6 +81,8 @@ TCPSocketNewBind:
 	mov ecx, esp  ;; function args
 	int 0x80
 
+	mov esp, ebp
+
 	;; turn the socket into a listening socket
 
 	push 0   ;; queue size
@@ -89,6 +91,9 @@ TCPSocketNewBind:
 	mov eax, 0x66 ;; sys_socketcall
 	mov ebx, 4    ;; sys_listen
 	mov ecx, esp  ;; function args
+	int 0x80
+
+	mov esp, ebp
 
 	;; return the socket fd
 	mov eax, edx
