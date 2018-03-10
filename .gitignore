@@ -7,3 +7,6 @@
 */main
 sem1/source.txt
 sem1/dest.txt
+sem2/call_bash
+sem2/echo
+sem2/reverse_shell
