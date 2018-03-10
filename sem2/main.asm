@@ -18,24 +18,16 @@ _start:
 	call TCPSocketAccept
 	mov [ebp-8], eax
 
-	push 0 ;; flags
-	push gotstr_len
-	push gotstr
-	push dword [ebp-8]
-
-	mov eax, 0x66
-	mov ebx, 10 ;; sys_recv
-	mov ecx, esp
+	mov eax, 3
+	mov ebx, [ebp-8]
+	mov ecx, gotstr
+	mov edx, gotstr_len
 	int 0x80
 
-	push 0 ;; flags
-	push greetstr_len
-	push greetstr
-	push dword [ebp-8] ;; sockfd
-
-	mov eax, 0x66 ;; sys_socketcall
-	mov ebx, 9    ;; sys_send
-	mov ecx, esp
+	mov eax, 4
+	mov ebx, [ebp-8]
+	mov ecx, greetstr
+	mov edx, greetstr_len
 	int 0x80
 
 	push dword [ebp-8]
