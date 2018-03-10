@@ -115,7 +115,7 @@ TCPSocketAccept:
 	push ebx
 	mov ebp, esp
 	;; sockfd
-	mov eax, [ebp+8]
+	mov eax, [ebp+12]
 
 	;; call sys_accept
 	push 0   ;; structure length
@@ -140,7 +140,7 @@ TCPSocketClose:
 	push ebx
 
 	mov eax, 6         ;; sys_close
-	mov ebx, [esp + 4] ;; argument
+	mov ebx, [esp + 8] ;; argument
 	int 0x80
 
 	pop ebx
