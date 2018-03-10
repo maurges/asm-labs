@@ -26,7 +26,7 @@ section .text
 ; .text {{{
 
 ; TCPSocketNewBind {{{
-;; subroutine RETURNS sockfd
+;; function ARGS cdecl: port::uint16 RETURNS: sockfd
 TCPSocketNewBind:
 	push ebp
 	push ebx
@@ -70,7 +70,8 @@ TCPSocketNewBind:
 	;; build the sockaddr_in type
 	sub esp, sockaddr_in.size
 	mov [esp + sockaddr_in.sin_addr], dword 0
-	mov [esp + sockaddr_in.sin_port], word 0xa1ed
+	mov ax, [ebp + 16]
+	mov [esp + sockaddr_in.sin_port], ax
 	mov [esp + sockaddr_in.sin_family], word 2
 	mov [esp + sockaddr_in.sin_zero], dword 0
 	mov [esp + sockaddr_in.sin_zero + 4], dword 0

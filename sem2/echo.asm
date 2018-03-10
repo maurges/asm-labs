@@ -11,6 +11,7 @@ _start:
 	mov ebp, esp
 	sub esp, 8 ;; two values: two sockfd
 
+	push word 0x3905
 	call TCPSocketNewBind
 	mov [ebp-4], eax
 
