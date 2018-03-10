@@ -109,7 +109,7 @@ TCPSocketNewBind:
 ; }}}
 
 ; TCPSocketAccept {{{
-;; function TCPSocketAccept ARGS cdecl: sockfd
+;; function TCPSocketAccept ARGS cdecl: sockfd RETURNS: sockfd
 TCPSocketAccept:
 	push ebp
 	push ebx
@@ -127,6 +127,7 @@ TCPSocketAccept:
 	mov ecx, esp  ;; function args
 	int 0x80
 
+	;; return val is in eax
 	mov esp, ebp
 	pop ebx
 	pop ebp
