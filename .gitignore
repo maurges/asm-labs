@@ -10,3 +10,5 @@ sem1/dest.txt
 sem2/call_bash
 sem2/echo
 sem2/reverse_shell
+sem2/prepare
+sem2/jump_mmap

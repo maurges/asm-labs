@@ -7,6 +7,7 @@ _start:
 	mov esi, code
 	mov edi, code_end
 .loop:	mov al, [esi]
+	xor al, 228
 	mov bl, al
 	shr al, 4
 	and bl, 0xf

@@ -2,7 +2,7 @@ ASM = nasm
 NASMFLAGS = -f elf -F dwarf -g
 LDFLAGS = -m elf_i386
 
-all: echo call_bash reverse_shell
+all: echo call_bash reverse_shell jump_mmap
 
 %.o: %.asm
 	$(ASM) $< $(NASMFLAGS) -o $@
