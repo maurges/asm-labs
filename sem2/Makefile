@@ -32,6 +32,9 @@ prepare: prepare.asm cb_obj.asm
 	$(ASM) $< $(NASMFLAGS) -o prepare.o
 	ld $(LDFLAGS) prepare.o -o $@
 
+format_echo: format_echo.o socket.o
+	gcc -m32 -o $@ $^
+
 .PHONY: run-prepare
 run-prepare: prepare
 	./prepare
